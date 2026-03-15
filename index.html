@@ -63,28 +63,26 @@
             text-transform: uppercase;
         }
 
-        /* BOTÓN DESENCRIPTAR: Posicionado en la línea roja, fondo blanco, letra negra */
+        /* BOTÓN: Fondo blanco, letra negra, sobre la línea roja */
         #btn-desencriptar {
             position: absolute;
-            bottom: 13%; /* Ajustado sobre la línea roja de tu imagen */
-            right: 11%;  /* Alineado a la derecha del cuadro negro */
+            bottom: 13%; 
+            right: 11%;  
             background-color: #ffffff;
             color: #000000;
             border: none;
-            padding: 4px 12px;
+            padding: 5px 15px;
             font-family: 'Cinzel', serif;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             z-index: 10;
         }
 
-        #btn-desencriptar:hover {
-            background-color: #e0e0e0;
-        }
+        #btn-desencriptar:hover { background-color: #e0e0e0; }
 
-        /* --- MODAL DE INVITACIÓN --- */
+        /* MODAL DE ÉXITO */
         #overlay-bloqueo {
             display: none;
             position: fixed;
@@ -100,7 +98,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             width: 80%;
-            max-width: 350px;
+            max-width: 380px;
             background: #f4e4bc;
             border: 8px double #8b4513;
             padding: 25px;
@@ -110,7 +108,7 @@
         }
 
         #modal-exito h2 { color: #8b0000; margin: 0 0 15px 0; }
-        #modal-exito p { color: #3e2723; font-weight: bold; font-size: 1.1rem; }
+        #modal-exito p { color: #3e2723; font-weight: bold; font-size: 1.1rem; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -132,9 +130,9 @@
 
     <div id="overlay-bloqueo"></div>
     <div id="modal-exito">
-        <h2>📜 ¡INVITACIÓN!</h2>
+        <h2>📜 ¡INVITACIÓN REVELADA!</h2>
         <p id="mensaje-invitacion"></p>
-        <button onclick="location.reload()" style="margin-top: 15px; cursor: pointer; padding: 5px 15px;">Aceptar</button>
+        <button onclick="location.reload()" style="margin-top: 20px; cursor: pointer; padding: 8px 20px; font-family: 'Cinzel';">Cerrar</button>
     </div>
 
     <script>
@@ -146,7 +144,7 @@
             if (imgCerrada.style.display === 'none') return;
             imgCerrada.style.display = 'none';
             video.style.display = 'block';
-            video.play().catch(e => console.log(e));
+            video.play().catch(e => console.log("Error video:", e));
 
             video.onended = () => {
                 video.style.display = 'none';
@@ -155,22 +153,43 @@
             };
         }
 
-        function verificarRespuesta(e) {
-            e.stopPropagation(); 
-            const input = document.getElementById('texto-usuario').value.toUpperCase().trim();
-            const respuestaLimpia = input.replace(/\n/g, " ").replace(/\s+/g, " ");
-            
-            // Mensaje objetivo
-            const objetivo = "SABADO 18 ABRIL VENIR CASA EMI NOCHE 21HS";
+  function verificarRespuesta(e) {
+    e.stopPropagation(); 
+    
+    // 1. Capturamos el valor del textarea
+    let input = document.getElementById('texto-usuario').value;
 
-            if (respuestaLimpia === objetivo) {
-                document.getElementById('overlay-bloqueo').style.display = 'block';
-                document.getElementById('modal-exito').style.display = 'block';
-                document.getElementById('mensaje-invitacion').innerText = "Invitación desencriptada. Sabado 18/4 21hs en la casa de Emi. Confirmar asistencia o los dioses te van a castigar (?)";
-            } else {
-                alert("Los dioses no están satisfechos. Revisa las runas.");
-            }
+    // 2. FUNCIÓN DE LIMPIEZA EXTREMA
+    function limpiar(texto) {
+        return texto
+            .normalize("NFD")                          // Descompone tildes (Á -> A + ´)
+            .replace(/[\u0300-\u036f]/g, "")           // Borra los tildes
+            .toUpperCase()                             // Todo a Mayúsculas
+            .replace(/\r?\n|\r/g, " ")                // Convierte cualquier tipo de Enter en espacio
+            .replace(/\s+/g, " ")                      // Convierte múltiples espacios en uno solo
+            .trim();                                   // Quita espacios al inicio y al final
+    }
+
+    const respuestaUsuario = limpiar(input);
+    const objetivo = "SABADO 18 ABRIL VENIR CASA EMI NOCHE 21HS";
+
+    // DEBUG: Esto te permite ver en la consola (F12) qué está entendiendo la PC
+    console.log("Usuario escribió:", respuestaUsuario);
+    console.log("Objetivo:", objetivo);
+
+    if (respuestaUsuario === objetivo) {
+        document.getElementById('overlay-bloqueo').style.display = 'block';
+        document.getElementById('modal-exito').style.display = 'block';
+        document.getElementById('mensaje-invitacion').innerText = "Invitación desencriptada. Sabado 18/4 21hs en la casa de Emi. Confirmar asistencia o los dioses te van a castigar (?)";
+    } else {
+        // Mensaje de ayuda si le falta un pedazo
+        if (respuestaUsuario.length < objetivo.length && respuestaUsuario.length > 5) {
+            alert("El mensaje parece incompleto... ¿Escribiste todas las líneas?");
+        } else {
+            alert("Las runas no coinciden. Revisa el mensaje y los espacios.");
         }
+    }
+}
     </script>
 </body>
 </html>
