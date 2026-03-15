@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Mensaje de los Dioses</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
+
+        #contenedor-principal {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            cursor: pointer;
+        }
+
+        .elemento-capa {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #img-cerrada { z-index: 5; display: block; }
+        #video-transicion { display: none; z-index: 4; }
+
+        #capa-final {
+            display: none;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Cuadro de texto */
+        #texto-usuario {
+            position: absolute;
+            bottom: 12%; 
+            left: 10%;
+            width: 80%;
+            height: 14%;
+            background-color: #000; 
+            border: 1px solid #333;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: none;
+            text-transform: uppercase;
+        }
+
+        /* BOTÓN DESENCRIPTAR: Posicionado en la línea roja, fondo blanco, letra negra */
+        #btn-desencriptar {
+            position: absolute;
+            bottom: 13%; /* Ajustado sobre la línea roja de tu imagen */
+            right: 11%;  /* Alineado a la derecha del cuadro negro */
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 4px 12px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+
+        #btn-desencriptar:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* --- MODAL DE INVITACIÓN --- */
+        #overlay-bloqueo {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 99;
+        }
+
+        #modal-exito {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 350px;
+            background: #f4e4bc;
+            border: 8px double #8b4513;
+            padding: 25px;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        #modal-exito h2 { color: #8b0000; margin: 0 0 15px 0; }
+        #modal-exito p { color: #3e2723; font-weight: bold; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div id="contenedor-principal" onclick="iniciar()">
+        <img src="pergamino_sellado.png" id="img-cerrada" class="elemento-capa">
+
+        <video id="video-transicion" class="elemento-capa" playsinline>
+            <source src="transicion.mp4" type="video/mp4">
+        </video>
+
+        <div id="capa-final" class="elemento-capa">
+            <img src="fffffffffffffffffffffff.png" class="elemento-capa">
+            
+            <textarea id="texto-usuario" placeholder="TU RESPUESTA AQUÍ..."></textarea>
+            <button id="btn-desencriptar" onclick="verificarRespuesta(event)">Desencriptar</button>
+        </div>
+    </div>
+
+    <div id="overlay-bloqueo"></div>
+    <div id="modal-exito">
+        <h2>📜 ¡INVITACIÓN!</h2>
+        <p id="mensaje-invitacion"></p>
+        <button onclick="location.reload()" style="margin-top: 15px; cursor: pointer; padding: 5px 15px;">Aceptar Destino</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('video-transicion');
+        const imgCerrada = document.getElementById('img-cerrada');
+        const capaFinal = document.getElementById('capa-final');
+
+        function iniciar() {
+            if (imgCerrada.style.display === 'none') return;
+            imgCerrada.style.display = 'none';
+            video.style.display = 'block';
+            video.play().catch(e => console.log(e));
+
+            video.onended = () => {
+                video.style.display = 'none';
+                capaFinal.style.display = 'block';
+                setTimeout(() => { capaFinal.style.opacity = '1'; }, 50);
+            };
+        }
+
+        function verificarRespuesta(e) {
+            e.stopPropagation(); 
+            const input = document.getElementById('texto-usuario').value.toUpperCase().trim();
+            const respuestaLimpia = input.replace(/\n/g, " ").replace(/\s+/g, " ");
+            
+            // Mensaje objetivo
+            const objetivo = "SABADO 18 ABRIL VENIR CASA EMI NOCHE 21HS";
+
+            if (respuestaLimpia === objetivo) {
+                document.getElementById('overlay-bloqueo').style.display = 'block';
+                document.getElementById('modal-exito').style.display = 'block';
+                document.getElementById('mensaje-invitacion').innerText = "Invitación desencriptada. Sabado 18/4 21hs en la casa de Emi. Confirmar asistencia o los dioses te van a castigar (?)";
+            } else {
+                alert("Los dioses no están satisfechos. Revisa las runas.");
+            }
+        }
+    </script>
+</body>
+</html>
